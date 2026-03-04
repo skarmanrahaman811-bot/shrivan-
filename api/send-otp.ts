@@ -1,8 +1,14 @@
-// api/send-otp.ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import twilio from 'twilio';
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  // Check if the request is a POST request
+// Initialize Twilio with your Environment Variables
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID, 
+  process.env.TWILIO_AUTH_TOKEN
+);
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Only allow POST requests from your frontend
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -13,12 +19,20 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Phone number is required' });
   }
 
-  // Logic to send actual SMS would go here
-  console.log(`Sending OTP to: ${phone}`);
+  // Generate a random 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Return success to the frontend
-  return res.status(200).json({ 
-    success: true, 
-    message: 'OTP sent successfully!' 
-  });
+  try {
+    // Send the actual SMS
+    await client.messages.create({
+      body: `Your Shrivan Science Academy OTP is: ${otp}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phone,
+    });
+
+    return res.status(200).json({ success: true, message: 'OTP sent!' });
+  } catch (error: any) {
+    console.error('Twilio Error:', error.message);
+    return res.status(500).json({ error: 'Failed to send SMS' });
+  }
 }
