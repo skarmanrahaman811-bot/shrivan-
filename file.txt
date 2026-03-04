@@ -1,0 +1,16 @@
+your-project-name/
+│
+├── public/              (Your logo goes here)
+│   └── 484304713_582902518240418_1364827835171205980_n.jpg
+│
+├── src/                 <-- Click this folder
+│   ├── App.tsx          <-- THIS IS YOUR APP FILE
+│   ├── main.tsx
+│   ├── index.css
+│   ├── components/      (Your Login, Dashboard files)
+│   ├── context/         (Auth, Data logic)
+│   └── types/
+│
+├── index.html
+├── package.json
+└── vite.config.ts
